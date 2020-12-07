@@ -8,8 +8,36 @@ public class Main {
     public static void main(String[] args) {
 	    //correctnessTest();
         //System.out.println(factorial(12));
-        timeTest();
+        //timeTest();
+        solutionQuality();
 
+    }
+    public static void solutionQuality(){
+        System.out.println("Solution Quality Ratio");
+        System.out.format("%18s %18s %18s %18s",
+                "N", "Brute Cost", "Greedy Cost", "SQR\n");
+        int maxN = 13;
+        double greedyCost = 0;
+        double bruteCost = 0;
+
+        for(int N = 4; N < maxN; N++) {
+            //double[][] a = GenerateRandomCostMatrix(N,100);
+            double[][] a = GenerateRandomEuclideanCostMatrix(N, 100);
+            //double[][] a = GenerateRandomCircularGraphCostMatrix(40, 100, true);
+
+            TSPGraph g1 = new TSPGraph(a);
+            g1.Greedy();
+            greedyCost = g1.getCost();
+
+            TSPGraph g2 = new TSPGraph(a);
+            g2.BruteWrapper();
+            bruteCost = g2.getCost();
+
+
+            System.out.format("%18s %18.2f %18.2f %18.2f\n",
+                    N, bruteCost, greedyCost, greedyCost / bruteCost);
+
+        }
     }
     public static void timeTest(){
         System.out.println("Greedy");
