@@ -153,40 +153,52 @@ public class Main {
         }
 
         public void BruteWrapper(){
-            ArrayList<Integer> uN = new ArrayList<>();
-            ArrayList<Integer> uuN = new ArrayList<>();
-            uN.add(0);
+            // Assistance method that fills out the first ArrayLists to pass to Brute recursive function
+
+            ArrayList<Integer> uN = new ArrayList<>(); // Used node list
+            ArrayList<Integer> uuN = new ArrayList<>(); // Unused node list
+            uN.add(0); // Adds first node, which is always 0
+
+            // Fills unused node list with all nodes except 0
             for(int w = 1; w < costMatrix.length; w++)
                 uuN.add(w);
             Brute(uN, uuN);
         }
         public void Greedy(){
             int N = costMatrix.length;
-            int[] travelLog = new int[N + 1];
+            int[] travelLog = new int[N + 1]; // Keeps track of paths visited
             travelLog[0] = 1;
+
+            // Fill path with zeroes
             for(int i = 0; i < N + 1; i++)
                 path.add(0);
 
+            // i = the i-th node in the path
+            // i-1 node is the origin of the currently evaluated edge
+            // j node is the destination of the currently evaluated edge
+            // This nested loop finds the lowest edge coming out of the origin
+            // and assigns that j node to the i-th position in path
             for(int i = 1; i < N; i++){
                 double low = -1;
 
                 for(int j = 0; j < N; j++){
-                    if( travelLog[j] != 1
-                            && j != path.get(i-1)
-                            && costMatrix[ path.get(i-1) ][j] != 0
-                            && (low == -1 || costMatrix[ path.get(i-1) ][j] < low)){
+                    if( travelLog[j] != 1                                               // Checks if j node has been visited
+                            && j != path.get(i-1)                                       // Checks if j node == origin node
+                            && costMatrix[ path.get(i-1) ][j] != 0                      // Checks to make sure an edge exists
+                            && (low == -1 || costMatrix[ path.get(i-1) ][j] < low)){    // Checks if no current low (-1) or cost < current low
 
                         low = costMatrix[ path.get(i-1) ][j];
                         path.set(i, j);
                     }
                 }
-                travelLog[path.get(i)] = 1;
+                travelLog[path.get(i)] = 1; // mark visited nodes
             }
         }
 
         public double getCost(){
             double cost = 0;
 
+            // Sums cost of edges from node i-1 to node i
             for(int i = 1; i < path.size(); i++){
                 double tmpCost = costMatrix[ path.get(i - 1) ][ path.get(i) ];
                 cost += (tmpCost != 0) ? tmpCost : 999999;
@@ -196,51 +208,13 @@ public class Main {
         public double getPerspectiveCost(){
             double cost = 0;
 
+            // Sums cost of edges from node i-1 to node i
             for(int i = 1; i < perspectivePath.size(); i++){
                 double tmpCost = costMatrix[ perspectivePath.get(i - 1) ][ perspectivePath.get(i) ];
                 cost += (tmpCost != 0) ? tmpCost : 999999;
             }
             return cost;
         }
-    }
-
-    public static int[] TSPGreedy(double[][] costMatrix){
-        int N = costMatrix.length;
-        int[] path = new int[N + 1]; //
-
-
-        for(int i = 1; i < N; i++){
-            double low = -1;
-
-            for(int j = 0; j < N; j++){
-                if( !contains(path, j)
-                    && j != path[i-1]
-                    && costMatrix[ path[i-1] ][j] != 0
-                    && (low == -1 || costMatrix[ path[i-1] ][j] < low)){
-
-                    low = costMatrix[ path[i-1] ][j];
-                    path[i] = j;
-                }
-            }
-
-
-
-        }
-
-        return path;
-    }
-
-    public static boolean contains(int[] a, int b){
-        boolean hasValue = false;
-
-        for(int i = 0; i < a.length; i++){
-            if(a[i] == b){
-                hasValue = true;
-                break;
-            }
-        }
-        return hasValue;
-
     }
 
     public static double[][] GenerateRandomCircularGraphCostMatrix(int N, double r, boolean isTest){
@@ -252,14 +226,16 @@ public class Main {
         graphPoints[0][0] = 0;
         graphPoints[0][1] = r;
 
-        ArrayList<Integer> nodeSet = new ArrayList<>();
+        ArrayList<Integer> nodeSet = new ArrayList<>(); // tracks list of remaining nodes
         for(int i = 1; i < N; i++)
             nodeSet.add(i);
 
         for(int i = 1; i < N; i++){
+            // Coordinates for next point... uses radians
             double x = r * Math.sin(2 * pi / N * i);
             double y = r * Math.cos(2 * pi / N * i);
 
+            // Randomly select which node is next
             int randomNum =  ThreadLocalRandom.current().nextInt(0, N - i );
             int a = nodeSet.get(randomNum);
             nodeSet.remove(randomNum);
@@ -270,7 +246,7 @@ public class Main {
         }
         path[path.length - 1] = 0;
 
-        double distance = -1;
+        double distance = -1; // tracks distance between nodes on circular path
 
         for(int j = 0; j < N - 1; j++){
             for(int k = N - 1; k > j; k--){
@@ -287,6 +263,7 @@ public class Main {
             }
         }
 
+        // Test section to print out the graph points and costmatrix
         if(isTest){
             for(int j = 0; j < N + 1; j++){
                 if(j % 5 == 0 && j > 0) System.out.format("\n");
@@ -297,9 +274,9 @@ public class Main {
             System.out.format("\n");
             for(int i = 0; i < N; i++){
                 for(int j = 0; j < N; j++){
-                    //System.out.format("%6.2f ", costMatrix[i][j]);
+                    System.out.format("%6.2f ", costMatrix[i][j]);
                 }
-                //System.out.format("\n");
+                System.out.format("\n");
             }
         }
 
@@ -311,6 +288,7 @@ public class Main {
         int randomNum;
         double[][] costMatrix = new double[N][N];
 
+        // Create random values for points on the graph
         for(int i = 0; i < N; i++){
             randomNum =  ThreadLocalRandom.current().nextInt(0, max + 1);
             graphPoints[i][0] = randomNum;
@@ -318,6 +296,7 @@ public class Main {
             graphPoints[i][1] = randomNum;
         }
 
+        // Convert the graph points to edge costs for the Cost Matrix
         for(int j = 0; j < N - 1; j++){
             for(int k = N - 1; k > j; k--){
                 int x1 = graphPoints[j][0];
@@ -337,10 +316,11 @@ public class Main {
         double[][] costMatrix = new double[N][N];
         int randomNum;
 
+        // Iterate through the 2d array and assign random costs to each edge
         for(int i = 0; i < N; i++){
             for(int j = i; j < N; j++){
                 if(i == j){
-                    costMatrix[i][j] = 0;
+                    costMatrix[i][j] = 0; // Populates 0 for all self edges, eg edge from node 3 to node 3 doesn't exist
                 }
                 else{
                     //Used top comment for random number generator https://stackoverflow.com/questions/363681/how-do-i-generate-random-integers-within-a-specific-range-in-java
